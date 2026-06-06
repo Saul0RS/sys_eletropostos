@@ -1,0 +1,2 @@
+srs6@cesar.school,saulinho,saulo123,dono_de_posto
+juninho@gmail.com,juninho,juninho123,cliente
