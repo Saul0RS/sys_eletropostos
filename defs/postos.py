@@ -1,9 +1,10 @@
-from arquivos import ler_postos, salvar_postos, gerar_id
-from utils import ler_texto, ler_float, ler_inteiro
+from defs.arquivos import ler_postos, salvar_postos, gerar_id
+from defs.usuarios import atualizar_status_usuario, obter_posto_usuario, obter_status_usuario
+from defs.utils import ler_texto, ler_float, ler_inteiro
 
 
 def cadastrar_posto(email_dono):
-    print("\n== Cadastro de novo posto ==")
+    print("== Cadastro de novo posto ==")
     nome = ler_texto("Nome do posto: ")
     lat = ler_float("Latitude do posto (-90 a 90): ", minimo=-90.0, maximo=90.0)
     lon = ler_float("Longitude do posto (-180 a 180): ", minimo=-180.0, maximo=180.0)
@@ -17,7 +18,7 @@ def cadastrar_posto(email_dono):
 
 def listar_postos():
     postos = ler_postos()
-    print("\n== Lista de postos ==")
+    print("== Lista de postos ==")
     if not postos:
         print("Nenhum posto cadastrado ainda.")
         return
@@ -28,7 +29,7 @@ def listar_postos():
 
 def listar_postos_do_dono(email_dono):
     postos = [posto for posto in ler_postos() if len(posto) > 5 and posto[5].lower() == email_dono.lower()]
-    print("\n== Meus postos ==")
+    print("== Meus postos ==")
     if not postos:
         print("Nenhum posto vinculado ao seu e-mail.")
         return
@@ -44,35 +45,57 @@ def _buscar_posto_por_id(postos, posto_id):
 
 
 def fazer_checkin_posto(usuario_email):
-    postos = ler_postos()
-    if not postos:
-        print("Nenhum posto cadastrado.")
+    todos_postos = ler_postos()
+    postos_livres = [posto for posto in todos_postos if posto[4].lower() == "livre"]
+    if not postos_livres:
+        print("Nenhum posto livre disponível para check-in.")
         return
-    listar_postos()
+    print("== Postos livres para check-in ==")
+    for posto in postos_livres:
+        dono = posto[5] if len(posto) > 5 and posto[5] else "N/A"
+        print(f"{posto[0]} - {posto[1]} | Lat: {posto[2]:.6f} | Lon: {posto[3]:.6f} | Dono: {dono}")
     posto_id = ler_inteiro("Digite o ID do posto para fazer check-in: ", minimo=1)
-    selecionado = _buscar_posto_por_id(postos, posto_id)
+    selecionado = _buscar_posto_por_id(postos_livres, posto_id)
     if selecionado is None:
-        print("ID de posto não encontrado.")
+        print("ID de posto não encontrado entre os postos livres.")
         return
-    selecionado[4] = "ocupado"
-    salvar_postos(postos)
-    print(f"Check-in realizado no posto {selecionado[1]}.")
+    posto_completo = _buscar_posto_por_id(todos_postos, posto_id)
+    posto_completo[4] = "ocupado"
+    salvar_postos(todos_postos)
+    # armazena o posto em que o usuário fez check-in
+    atualizar_status_usuario(usuario_email, "in", posto_id)
+    print(f"Check-in realizado no posto {posto_completo[1]}.")
 
 
 def fazer_checkout_posto(usuario_email):
-    postos = ler_postos()
-    if not postos:
-        print("Nenhum posto cadastrado.")
+    # só permite checkout do posto em que o usuário está
+    status = obter_status_usuario(usuario_email)
+    if status != "in":
+        print("Você não está em nenhum posto (nenhum check-in ativo).")
         return
-    listar_postos()
-    posto_id = ler_inteiro("Digite o ID do posto para fazer check-out: ", minimo=1)
-    selecionado = _buscar_posto_por_id(postos, posto_id)
-    if selecionado is None:
-        print("ID de posto não encontrado.")
+    posto_id_str = obter_posto_usuario(usuario_email)
+    if not posto_id_str:
+        print("Nenhum posto vinculado ao seu check-in. Contate o administrador.")
         return
-    selecionado[4] = "livre"
-    salvar_postos(postos)
-    print(f"Check-out realizado no posto {selecionado[1]}.")
+    try:
+        posto_id = int(posto_id_str)
+    except ValueError:
+        print("ID de posto inválido armazenado no usuário.")
+        return
+    todos_postos = ler_postos()
+    posto_completo = _buscar_posto_por_id(todos_postos, posto_id)
+    if posto_completo is None:
+        print("O posto associado ao seu check-in não foi encontrado.")
+        # limpa status por segurança
+        atualizar_status_usuario(usuario_email, "out", "")
+        return
+    # mostra as informações do posto e realiza o check-out
+    dono = posto_completo[5] if len(posto_completo) > 5 and posto_completo[5] else "N/A"
+    print(f"Realizando check-out no posto {posto_completo[0]} - {posto_completo[1]} | Lat: {posto_completo[2]:.6f} | Lon: {posto_completo[3]:.6f} | Dono: {dono}")
+    posto_completo[4] = "livre"
+    salvar_postos(todos_postos)
+    atualizar_status_usuario(usuario_email, "out", "")
+    print(f"Check-out realizado no posto {posto_completo[1]}.")
 
 
 def modificar_posto(email_dono):

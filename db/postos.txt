@@ -1,7 +1,7 @@
 1,Posto Centro,-23.550520,-46.633308,ocupado,srs6@cesar.school
 2,Posto Leste,-23.540000,-46.620000,ocupado,srs6@cesar.school
 3,Posto Norte,-23.520000,-46.635000,livre,
-6,Posto Vila Nova,-23.545000,-46.640000,livre,
+6,Posto Vila Nova,-23.545000,-46.640000,ocupado,
 7,Posto Jardim,-23.555000,-46.630000,livre,
 8,Posto Parque,-23.565000,-46.635000,livre,
 9,Posto Rio,-23.535000,-46.625000,livre,

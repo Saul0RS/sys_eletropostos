@@ -1,3 +1,17 @@
+VALID_DOMINIOS = [
+    "gmail.com",
+    "hotmail.com",
+    "outlook.com",
+    "yahoo.com.br",
+    "uol.com",
+    "ig.com.br",
+    "terra.com.br",
+    "bor.com.br",
+    "icloud.com",
+    "cesar.school",
+]
+
+
 def ler_texto(mensagem):
     while True:
         texto = input(mensagem).strip()
@@ -12,6 +26,18 @@ def ler_senha(mensagem):
         if senha:
             return senha
         print("Entrada inválida. Por favor, informe uma senha não vazia.")
+
+
+def validar_email(email):
+    if not isinstance(email, str):
+        return False
+    email = email.strip().lower()
+    if email.count("@") != 1:
+        return False
+    local, dominio = email.split("@", 1)
+    if not local or not dominio:
+        return False
+    return dominio in VALID_DOMINIOS
 
 
 def ler_inteiro(mensagem, minimo=None, maximo=None):

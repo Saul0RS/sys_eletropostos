@@ -1,7 +1,10 @@
 import os
 
-USUARIOS_ARQUIVO = "usuarios.txt"
-POSTOS_ARQUIVO = "postos.txt"
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+DB_DIR = os.path.join(BASE_DIR, "db")
+os.makedirs(DB_DIR, exist_ok=True)
+USUARIOS_ARQUIVO = os.path.join(DB_DIR, "usuarios.txt")
+POSTOS_ARQUIVO = os.path.join(DB_DIR, "postos.txt")
 
 
 def criar_arquivo_se_nao_existe(nome_arquivo):
@@ -25,24 +28,23 @@ def ler_usuarios():
             if not linha:
                 continue
             partes = linha.split(",")
-            if len(partes) == 4:
+            if len(partes) >= 4 and "@" in partes[0]:
                 email = partes[0].strip().lower()
                 nome = partes[1].strip()
                 senha = partes[2]
                 tipo = partes[3].strip()
-                usuarios.append([email, nome, senha, tipo])
-            elif len(partes) == 3 and "@" in partes[0]:
-                email = partes[0].strip().lower()
-                nome = partes[1].strip()
-                senha = partes[2]
-                usuarios.append([email, nome, senha, "cliente"])
+                status = partes[4].strip().lower() if len(partes) >= 5 else "out"
+                posto_atual = partes[5].strip() if len(partes) >= 6 else ""
+                usuarios.append([email, nome, senha, tipo, status, posto_atual])
     return usuarios
 
 
 def salvar_usuarios(usuarios):
     with open(USUARIOS_ARQUIVO, "w", encoding="utf-8") as arquivo:
         for usuario in usuarios:
-            linha = f"{usuario[0]},{usuario[1]},{usuario[2]},{usuario[3]}\n"
+            status = usuario[4] if len(usuario) > 4 else "out"
+            posto_atual = usuario[5] if len(usuario) > 5 else ""
+            linha = f"{usuario[0]},{usuario[1]},{usuario[2]},{usuario[3]},{status},{posto_atual}\n"
             arquivo.write(linha)
 
 

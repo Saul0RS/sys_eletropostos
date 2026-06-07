@@ -1,8 +1,8 @@
-from usuarios import menu_autenticacao, menu_gerenciar_usuario
-from postos import listar_postos, fazer_checkin_posto, fazer_checkout_posto, menu_posto
-from calculos import filtrar_postos_no_buffer, distancia_entre_pontos_metros
-from arquivos import ler_postos
-from utils import ler_float, ler_inteiro
+from defs.usuarios import menu_autenticacao, menu_gerenciar_usuario, obter_status_usuario
+from defs.postos import listar_postos, fazer_checkin_posto, fazer_checkout_posto, menu_posto
+from defs.calculos import filtrar_postos_no_buffer, distancia_entre_pontos_metros
+from defs.arquivos import ler_postos
+from defs.utils import ler_float, ler_inteiro
 
 
 def menu_rotas():
@@ -30,11 +30,16 @@ def menu_rotas():
 
 def menu_usuario_logado(usuario_email, nome_usuario, usuario_tipo):
     while True:
+        status = obter_status_usuario(usuario_email)
+        if status not in ["in", "out"]:
+            status = "out"
         print(f"\n===== Menu de {nome_usuario} =====")
         print("1 - Traçar rota e buscar postos")
         print("2 - Ver lista de postos")
-        print("3 - Check-in em um posto")
-        print("4 - Check-out de um posto")
+        if status == "out":
+            print("3 - Check-in em um posto")
+        else:
+            print("3 - Check-out em um posto")
         print("5 - Gerenciar usuário")
         if usuario_tipo == "dono_de_posto":
             print("6 - Gerenciar meus postos")
@@ -48,9 +53,10 @@ def menu_usuario_logado(usuario_email, nome_usuario, usuario_tipo):
         elif opcao == 2:
             listar_postos()
         elif opcao == 3:
-            fazer_checkin_posto(usuario_email)
-        elif opcao == 4:
-            fazer_checkout_posto(usuario_email)
+            if status == "out":
+                fazer_checkin_posto(usuario_email)
+            else:
+                fazer_checkout_posto(usuario_email)
         elif opcao == 5:
             if menu_gerenciar_usuario(usuario_email):
                 return True
@@ -64,7 +70,7 @@ def menu_usuario_logado(usuario_email, nome_usuario, usuario_tipo):
 
 def main():
     while True:
-        usuario_email, nome_usuario, usuario_tipo = menu_autenticacao()
+        usuario_email, nome_usuario, usuario_tipo, _ = menu_autenticacao()
         if usuario_email is None:
             break
         usuario_deletado = menu_usuario_logado(usuario_email, nome_usuario, usuario_tipo)

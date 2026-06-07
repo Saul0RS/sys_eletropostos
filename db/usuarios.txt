@@ -1,0 +1,3 @@
+srs6@cesar.school,saulinho,saulo123,dono_de_posto,out,
+juninho@gmail.com,juninho,juninho123,cliente,out,
+beatriz@gmail.com,beatriz,beatriz123,cliente,out,
