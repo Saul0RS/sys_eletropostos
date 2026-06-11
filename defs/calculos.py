@@ -23,11 +23,11 @@ def distancia_entre_pontos_metros(lat1, lon1, lat2, lon2):
     return haversine(lat1, lon1, lat2, lon2) * 1000
 
 
-def distancia_ponto_segmento(lat_origem, lon_origem, lat_destino, lon_destino, lat_ponto, lon_ponto):
-    d_origem_ponto = haversine(lat_origem, lon_origem, lat_ponto, lon_ponto) / RADIUS_TERRA_KM
-    d_origem_destino = haversine(lat_origem, lon_origem, lat_destino, lon_destino) / RADIUS_TERRA_KM
+def distancia_ponto_segmento(lat_or, lon_o, lat_d, lon_d, lat_p, lon_p):
+    d_origem_ponto = haversine(lat_or, lon_o, lat_p, lon_p) / RADIUS_TERRA_KM
+    d_origem_destino = haversine(lat_or, lon_o, lat_d, lon_d) / RADIUS_TERRA_KM
     if d_origem_destino == 0:
-        return distancia_entre_pontos_metros(lat_origem, lon_origem, lat_ponto, lon_ponto)
+        return distancia_entre_pontos_metros(lat_or, lon_o, lat_p, lon_p)
 
     def angulo_bearing(lat_a, lon_a, lat_b, lon_b):
         lat_a_rad = math.radians(lat_a)
@@ -37,14 +37,14 @@ def distancia_ponto_segmento(lat_origem, lon_origem, lat_destino, lon_destino, l
         y = math.cos(lat_a_rad) * math.sin(lat_b_rad) - math.sin(lat_a_rad) * math.cos(lat_b_rad) * math.cos(dlon_rad)
         return math.atan2(x, y)
 
-    theta_12 = angulo_bearing(lat_origem, lon_origem, lat_destino, lon_destino)
-    theta_13 = angulo_bearing(lat_origem, lon_origem, lat_ponto, lon_ponto)
+    theta_12 = angulo_bearing(lat_or, lon_o, lat_d, lon_d)
+    theta_13 = angulo_bearing(lat_or, lon_o, lat_p, lon_p)
     d_xt = math.asin(math.sin(d_origem_ponto) * math.sin(theta_13 - theta_12)) * RADIUS_TERRA_KM
     d_at = math.acos(max(-1.0, min(1.0, math.cos(d_origem_ponto) / math.cos(d_xt / RADIUS_TERRA_KM)))) * RADIUS_TERRA_KM
 
     if d_at < 0 or d_at > d_origem_destino * RADIUS_TERRA_KM:
-        distancia1 = distancia_entre_pontos_metros(lat_ponto, lon_ponto, lat_origem, lon_origem)
-        distancia2 = distancia_entre_pontos_metros(lat_ponto, lon_ponto, lat_destino, lon_destino)
+        distancia1 = distancia_entre_pontos_metros(lat_p, lon_p, lat_or, lon_o)
+        distancia2 = distancia_entre_pontos_metros(lat_p, lon_p, lat_d, lon_d)
         return min(distancia1, distancia2)
 
     return abs(d_xt) * 1000

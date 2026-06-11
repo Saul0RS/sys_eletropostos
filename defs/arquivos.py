@@ -37,11 +37,17 @@ def ler_list_user():
                 nome = lineuser[1].strip()
                 senha = lineuser[2]
                 tipo = lineuser[3].strip()
+
                 if len(lineuser) > 4:
                     status = lineuser[4].strip().lower()
                 else:
                     status = "out"
-                posto_atual = lineuser[5].strip() if len(lineuser) > 5 else ""
+
+                if len(lineuser) > 5:
+                    posto_atual = lineuser[5].strip()
+                else:
+                    posto_atual = ""
+                    
                 usuarios.append([email, nome, senha, tipo, status, posto_atual])
 
     return usuarios
