@@ -7,18 +7,18 @@ from defs.utils import ler_float, ler_inteiro
 
 def menu_rotas():
     print("\n== Traçar rota e buscar postos no caminho ==")
-    lat_ori = ler_float("Latitude de origem (-90 a 90): ", minimo=-90.0, maximo=90.0)
-    lon_ori = ler_float("Longitude de origem (-180 a 180): ", minimo=-180.0, maximo=180.0)
-    lat_des = ler_float("Latitude de destino (-90 a 90): ", minimo=-90.0, maximo=90.0)
-    lon_des = ler_float("Longitude de destino (-180 a 180): ", minimo=-180.0, maximo=180.0)
-    raio = ler_float("Buffer em metros para buscar postos: ", minimo=0.0)
+    lat_ori = ler_float("Latitude de origem (-90 a 90): ", min=-90.0, max=90.0)
+    lon_ori = ler_float("Longitude de origem (-180 a 180): ", min=-180.0, max=180.0)
+    lat_des = ler_float("Latitude de destino (-90 a 90): ", min=-90.0, max=90.0)
+    lon_des = ler_float("Longitude de destino (-180 a 180): ", min=-180.0, max=180.0)
+    raio = ler_float("Buffer em metros para buscar postos: ", min=0.0)
     postos = ler_postos()
     if not postos:
         print("Nenhum posto cadastrado. Cadastre postos antes de traçar a rota.")
         return
     postos_no_caminho = filtrar_postos_no_buffer(lat_ori, lon_ori, lat_des, lon_des, raio, postos)
-    distancia_rota = distancia_entre_pontos_metros(lat_ori, lon_ori, lat_des, lon_des)
-    print(f"\nDistância aproximada da rota: {distancia_rota:.2f} metros")
+    dist_rota = distancia_entre_pontos_metros(lat_ori, lon_ori, lat_des, lon_des)
+    print(f"\nDistância aproximada da rota: {dist_rota:.2f} metros")
     print(f"Total de postos no caminho: {len(postos_no_caminho)}")
     if not postos_no_caminho:
         print("Nenhum posto encontrado dentro do buffer informado.")

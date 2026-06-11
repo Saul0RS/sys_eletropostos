@@ -1,15 +1,18 @@
-from defs.arquivos import ler_usuarios, salvar_usuarios, ler_postos, salvar_postos
+from defs.arquivos import ler_list_user, save_user, ler_postos, salvar_postos
 from defs.utils import ler_texto, ler_inteiro, ler_senha, validar_email
 
 
 def cadastrar_usuario():
     print("== Cadastro de novo usuário ==")
-    nome = ler_texto("Nome do usuário: ")
-    email = ler_texto("E-mail do usuário: ").lower()
+
+    nome = input("Nome do usuário: ")
+    email = input("E-mail do usuário: ").lower()
+
     if not validar_email(email):
         print("E-mail inválido. Utilize um domínio suportado e formato correto.")
         return
-    usuarios = ler_usuarios()
+    
+    usuarios = ler_list_user()
     if any(usuario[0] == email for usuario in usuarios):
         print("E-mail já cadastrado. Utilize outro e-mail.")
         return
@@ -24,7 +27,7 @@ def cadastrar_usuario():
     opcao_tipo = ler_inteiro("Tipo de usuário: ", minimo=1, maximo=2)
     tipo = "cliente" if opcao_tipo == 1 else "dono_de_posto"
     usuarios.append([email, nome, senha, tipo, "out"])
-    salvar_usuarios(usuarios)
+    save_user(usuarios)
     print(f"Usuário cadastrado com e-mail {email} e nome {nome}.")
 
 
@@ -35,7 +38,7 @@ def fazer_login():
         print("E-mail inválido. Utilize um domínio suportado e formato correto.")
         return None, None, None, None
     senha = ler_senha("Senha: ")
-    usuarios = ler_usuarios()
+    usuarios = ler_list_user()
     for usuario in usuarios:
         if usuario[0] == email and usuario[2] == senha:
             print(f"Bem-vindo, {usuario[1]}!")
@@ -46,7 +49,7 @@ def fazer_login():
 
 
 def obter_status_usuario(email_usuario):
-    usuarios = ler_usuarios()
+    usuarios = ler_list_user()
     for usuario in usuarios:
         if usuario[0] == email_usuario:
             return usuario[4] if len(usuario) > 4 else "out"
@@ -54,7 +57,7 @@ def obter_status_usuario(email_usuario):
 
 
 def obter_posto_usuario(email_usuario):
-    usuarios = ler_usuarios()
+    usuarios = ler_list_user()
     for usuario in usuarios:
         if usuario[0] == email_usuario:
             return usuario[5] if len(usuario) > 5 and usuario[5] else ""
@@ -62,7 +65,7 @@ def obter_posto_usuario(email_usuario):
 
 
 def atualizar_status_usuario(email_usuario, novo_status, posto_id=""):
-    usuarios = ler_usuarios()
+    usuarios = ler_list_user()
     for usuario in usuarios:
         if usuario[0] == email_usuario:
             usuario[4] = novo_status
@@ -72,25 +75,25 @@ def atualizar_status_usuario(email_usuario, novo_status, posto_id=""):
                 usuario[5] = str(usuario_atual)
             else:
                 usuario.append(str(usuario_atual))
-            salvar_usuarios(usuarios)
+            save_user(usuarios)
             return True
     return False
 
 
 def alterar_nome(email_usuario):
-    usuarios = ler_usuarios()
+    usuarios = ler_list_user()
     for usuario in usuarios:
         if usuario[0] == email_usuario:
             novo_nome = ler_texto("Novo nome: ")
             usuario[1] = novo_nome
-            salvar_usuarios(usuarios)
+            save_user(usuarios)
             print("Nome atualizado com sucesso.")
             return
     print("Usuário não encontrado.")
 
 
 def alterar_senha(email_usuario):
-    usuarios = ler_usuarios()
+    usuarios = ler_list_user()
     for usuario in usuarios:
         if usuario[0] == email_usuario:
             senha_atual = ler_senha("Senha atual: ")
@@ -103,19 +106,19 @@ def alterar_senha(email_usuario):
                 print("As senhas não coincidem.")
                 return
             usuario[2] = nova_senha
-            salvar_usuarios(usuarios)
+            save_user(usuarios)
             print("Senha atualizada com sucesso.")
             return
     print("Usuário não encontrado.")
 
 
 def deletar_usuario(email_usuario):
-    usuarios = ler_usuarios()
+    usuarios = ler_list_user()
     usuarios_ativos = [usuario for usuario in usuarios if usuario[0] != email_usuario]
     if len(usuarios_ativos) == len(usuarios):
         print("Usuário não encontrado.")
         return False
-    salvar_usuarios(usuarios_ativos)
+    save_user(usuarios_ativos)
     postos = ler_postos()
     postos_ativos = [posto for posto in postos if len(posto) <= 5 or posto[5].lower() != email_usuario.lower()]
     salvar_postos(postos_ativos)

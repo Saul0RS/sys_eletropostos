@@ -29,15 +29,13 @@ def ler_senha(mensagem):
 
 
 def validar_email(email):
-    if not isinstance(email, str):
-        return False
     email = email.strip().lower()
     if email.count("@") != 1:
         return False
     local, dominio = email.split("@", 1)
-    if not local or not dominio:
+    if not local or not dominio or not dominio in VALID_DOMINIOS:
         return False
-    return dominio in VALID_DOMINIOS
+    return True
 
 
 def ler_inteiro(mensagem, minimo=None, maximo=None):
