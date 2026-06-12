@@ -114,9 +114,10 @@ def alterar_nome(email_usuario):
     usuarios = ler_list_user()
     for usuario in usuarios:
         if usuario[0] == email_usuario:
-            novo_nome = input("Novo nome: ").strip()
-            if not novo_nome:
-                print("Nome não pode ficar vazio.")
+            atual = usuario[1]
+            novo_nome = input(f"Novo nome (ENTER para manter '{atual}'): ").strip()
+            if novo_nome == "":
+                print("Nome mantido.")
                 pausar()
                 return
             usuario[1] = novo_nome
@@ -184,19 +185,25 @@ def menu_gerenciar_usuario(email_usuario):
         print("2 - Alterar senha")
         print("3 - Deletar usuário")
         print("0 - Voltar")
+
         opcao = ler_inteiro("Escolha uma opção: ", minimo=0, maximo=3)
+
         if opcao == 1:
             limpar_tela()
             alterar_nome(email_usuario)
+        
         elif opcao == 2:
             limpar_tela()
             alterar_senha(email_usuario)
+        
         elif opcao == 3:
             limpar_tela()
             if deletar_usuario(email_usuario):
                 return True
+        
         elif opcao == 0:
             break
+
     return False
 
 
@@ -207,15 +214,20 @@ def menu_autenticacao():
         print("1 - Cadastrar")
         print("2 - Login")
         print("0 - Sair")
+
         opcao = ler_inteiro("Escolha uma opção: ", minimo=0, maximo=2)
+        
         if opcao == 1:
             limpar_tela()
             cadastrar_usuario()
+        
         elif opcao == 2:
             limpar_tela()
             usuario_email, nome_usuario, usuario_tipo, usuario_status = fazer_login()
+        
             if usuario_email is not None:
                 return usuario_email, nome_usuario, usuario_tipo, usuario_status
+        
         elif opcao == 0:
             print("Encerrando o sistema. Até mais!")
             return None, None, None, None

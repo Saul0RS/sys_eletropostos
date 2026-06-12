@@ -1,4 +1,4 @@
-1,Posto Centro,-23.550520,-46.633308,ocupado,srs6@cesar.school
+1,Posto Centro,-23.550520,-46.633308,livre,srs6@cesar.school
 2,Posto Leste,-23.540000,-46.620000,ocupado,srs6@cesar.school
 3,Posto Norte,-23.520000,-46.635000,livre,apolo@outlook.com
 6,Posto Vila Nova,-23.545000,-46.640000,ocupado,green@icloud.com
@@ -8,7 +8,7 @@
 10,Posto Praça,-23.548000,-46.638000,ocupado,green@icloud.com
 12,posto q fica ali,-8.043179,-34.925199,livre,srs6@cesar.school
 13,universidade católica de Pernambuco,-8.055882,-34.888129,ocupado,apolo@outlook.com
-14,M & M Recarga,-8.053618,-34.892086,ocupado,green@icloud.com
+14,M & M Recarga,-8.053618,-34.892086,livre,green@icloud.com
 15,hospital memorial são josé,-8.060085,-34.897002,ocupado,srs6@cesar.school
 16,santos eletroposto,-8.060661,-34.900825,livre,apolo@outlook.com
 17,mix mateus santo amaro,-8.049187,-34.880315,ocupado,green@icloud.com

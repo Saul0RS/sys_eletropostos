@@ -1,4 +1,4 @@
-srs6@cesar.school,saulinho,saulo123,dono_de_posto,in,14
+srs6@cesar.school,saulo,saulo123,dono_de_posto,out,
 juninho@gmail.com,juninho,juninho123,cliente,out,
 beatriz@gmail.com,beatriz,beatriz123,cliente,out,
 apolo@outlook.com,apolo,apolo123,dono_de_posto,out,
