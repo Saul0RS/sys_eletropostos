@@ -1,23 +1,23 @@
 from defs.usuarios import menu_autenticacao, menu_gerenciar_usuario, obter_status_usuario
 from defs.postos import listar_postos, fazer_checkin_posto, fazer_checkout_posto, menu_posto
-from defs.calculos import filtrar_postos_no_buffer, distancia_entre_pontos_metros
+from defs.calculos import rota_postos
 from defs.arquivos import ler_postos
-from defs.utils import ler_float, ler_inteiro
+from defs.utils import ler_float, ler_inteiro, limpar_tela
 
 
 def menu_rotas():
-    print("\n== Traçar rota e buscar postos no caminho ==")
-    lat_ori = ler_float("Latitude de origem (-90 a 90): ", min=-90.0, max=90.0)
-    lon_ori = ler_float("Longitude de origem (-180 a 180): ", min=-180.0, max=180.0)
-    lat_des = ler_float("Latitude de destino (-90 a 90): ", min=-90.0, max=90.0)
-    lon_des = ler_float("Longitude de destino (-180 a 180): ", min=-180.0, max=180.0)
-    raio = ler_float("Buffer em metros para buscar postos: ", min=0.0)
+    limpar_tela()
+    print("== Traçar rota e buscar postos no caminho ==")
+    lat_ori = ler_float("Latitude de origem (-90 a 90): ", minimo=-90.0, maximo=90.0)
+    lon_ori = ler_float("Longitude de origem (-180 a 180): ", minimo=-180.0, maximo=180.0)
+    lat_des = ler_float("Latitude de destino (-90 a 90): ", minimo=-90.0, maximo=90.0)
+    lon_des = ler_float("Longitude de destino (-180 a 180): ", minimo=-180.0, maximo=180.0)
+    raio = ler_float("Buffer em metros para buscar postos: ", minimo=0.0)
     postos = ler_postos()
     if not postos:
         print("Nenhum posto cadastrado. Cadastre postos antes de traçar a rota.")
         return
-    postos_no_caminho = filtrar_postos_no_buffer(lat_ori, lon_ori, lat_des, lon_des, raio, postos)
-    dist_rota = distancia_entre_pontos_metros(lat_ori, lon_ori, lat_des, lon_des)
+    dist_rota, postos_no_caminho = rota_postos(lat_ori, lon_ori, lat_des, lon_des, postos, raio)
     print(f"\nDistância aproximada da rota: {dist_rota:.2f} metros")
     print(f"Total de postos no caminho: {len(postos_no_caminho)}")
     if not postos_no_caminho:
@@ -30,10 +30,11 @@ def menu_rotas():
 
 def menu_usuario_logado(usuario_email, nome_usuario, usuario_tipo):
     while True:
+        limpar_tela()
         status = obter_status_usuario(usuario_email)
         if status not in ["in", "out"]:
             status = "out"
-        print(f"\n===== Menu de {nome_usuario} =====")
+        print(f"===== Menu de {nome_usuario} =====")
         print("1 - Traçar rota e buscar postos")
         print("2 - Ver lista de postos")
         if status == "out":
@@ -51,16 +52,20 @@ def menu_usuario_logado(usuario_email, nome_usuario, usuario_tipo):
         if opcao == 1:
             menu_rotas()
         elif opcao == 2:
+            limpar_tela()
             listar_postos()
         elif opcao == 3:
+            limpar_tela()
             if status == "out":
                 fazer_checkin_posto(usuario_email)
             else:
                 fazer_checkout_posto(usuario_email)
         elif opcao == 5:
+            limpar_tela()
             if menu_gerenciar_usuario(usuario_email):
                 return True
         elif opcao == 6 and usuario_tipo == "dono_de_posto":
+            limpar_tela()
             menu_posto(usuario_email)
         elif opcao == 0:
             print(f"Deslogando {nome_usuario}. Até mais!")

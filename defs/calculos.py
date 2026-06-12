@@ -1,59 +1,54 @@
 import math
 
-RADIUS_TERRA_KM = 6371.0
+R = 6371.0
 
 
-def haversine(lat1, lon1, lat2, lon2):
+def hav(lat1, lon1, lat2, lon2):
     dlat = math.radians(lat2 - lat1)
     dlon = math.radians(lon2 - lon1)
     a = math.sin(dlat / 2) ** 2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2) ** 2
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    return RADIUS_TERRA_KM * c
+    return R * c
 
 
-def validacao_latitude(valor):
-    return -90.0 <= valor <= 90.0
+def br(lat_a, lon_a, lat_b, lon_b):
+    lat_a_rad = math.radians(lat_a)
+    lat_b_rad = math.radians(lat_b)
+    dlon_rad = math.radians(lon_b - lon_a)
+    x = math.sin(dlon_rad) * math.cos(lat_b_rad)
+    y = math.cos(lat_a_rad) * math.sin(lat_b_rad) - math.sin(lat_a_rad) * math.cos(lat_b_rad) * math.cos(dlon_rad)
+    return math.atan2(x, y)
 
 
-def validacao_longitude(valor):
-    return -180.0 <= valor <= 180.0
+def rota_postos(lat_o, lon_o, lat_d, lon_d, postos, raio_m):
+    def dist_m(a_lat, a_lon, b_lat, b_lon):
+        return hav(a_lat, a_lon, b_lat, b_lon) * 1000
 
+    # validações simples
+    if not (-90.0 <= lat_o <= 90.0 and -90.0 <= lat_d <= 90.0 and -180.0 <= lon_o <= 180.0 and -180.0 <= lon_d <= 180.0):
+        raise ValueError("Coordenadas inválidas")
 
-def distancia_entre_pontos_metros(lat1, lon1, lat2, lon2):
-    return haversine(lat1, lon1, lat2, lon2) * 1000
+    def dist_point_seg(lo, ln, latd, lond, latp, lonp):
+        d_op = hav(lo, ln, latp, lonp) / R
+        d_od = hav(lo, ln, latd, lond) / R
+        if d_od == 0:
+            return dist_m(lo, ln, latp, lonp)
 
+        t12 = br(lo, ln, latd, lond)
+        t13 = br(lo, ln, latp, lonp)
+        d_xt = math.asin(math.sin(d_op) * math.sin(t13 - t12)) * R
+        d_at = math.acos(max(-1.0, min(1.0, math.cos(d_op) / math.cos(d_xt / R)))) * R
 
-def distancia_ponto_segmento(lat_or, lon_o, lat_d, lon_d, lat_p, lon_p):
-    d_origem_ponto = haversine(lat_or, lon_o, lat_p, lon_p) / RADIUS_TERRA_KM
-    d_origem_destino = haversine(lat_or, lon_o, lat_d, lon_d) / RADIUS_TERRA_KM
-    if d_origem_destino == 0:
-        return distancia_entre_pontos_metros(lat_or, lon_o, lat_p, lon_p)
+        if d_at < 0 or d_at > d_od * R:
+            d1 = dist_m(latp, lonp, lo, ln)
+            d2 = dist_m(latp, lonp, latd, lond)
+            return min(d1, d2)
+        return abs(d_xt) * 1000
 
-    def angulo_bearing(lat_a, lon_a, lat_b, lon_b):
-        lat_a_rad = math.radians(lat_a)
-        lat_b_rad = math.radians(lat_b)
-        dlon_rad = math.radians(lon_b - lon_a)
-        x = math.sin(dlon_rad) * math.cos(lat_b_rad)
-        y = math.cos(lat_a_rad) * math.sin(lat_b_rad) - math.sin(lat_a_rad) * math.cos(lat_b_rad) * math.cos(dlon_rad)
-        return math.atan2(x, y)
-
-    theta_12 = angulo_bearing(lat_or, lon_o, lat_d, lon_d)
-    theta_13 = angulo_bearing(lat_or, lon_o, lat_p, lon_p)
-    d_xt = math.asin(math.sin(d_origem_ponto) * math.sin(theta_13 - theta_12)) * RADIUS_TERRA_KM
-    d_at = math.acos(max(-1.0, min(1.0, math.cos(d_origem_ponto) / math.cos(d_xt / RADIUS_TERRA_KM)))) * RADIUS_TERRA_KM
-
-    if d_at < 0 or d_at > d_origem_destino * RADIUS_TERRA_KM:
-        distancia1 = distancia_entre_pontos_metros(lat_p, lon_p, lat_or, lon_o)
-        distancia2 = distancia_entre_pontos_metros(lat_p, lon_p, lat_d, lon_d)
-        return min(distancia1, distancia2)
-
-    return abs(d_xt) * 1000
-
-
-def filtrar_postos_no_buffer(lat_ori, lon_ori, lat_des, lon_des, raio_m, postos):
-    resultado = []
-    for posto in postos:
-        distancia = distancia_ponto_segmento(lat_ori, lon_ori, lat_des, lon_des, posto[2], posto[3])
-        if distancia <= raio_m:
-            resultado.append([posto[0], posto[1], posto[2], posto[3], posto[4], round(distancia, 2)])
-    return resultado
+    total = dist_m(lat_o, lon_o, lat_d, lon_d)
+    res = []
+    for p in postos:
+        d = dist_point_seg(lat_o, lon_o, lat_d, lon_d, p[2], p[3])
+        if d <= raio_m:
+            res.append([p[0], p[1], p[2], p[3], p[4], round(d, 2)])
+    return total, res

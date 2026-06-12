@@ -1,11 +1,14 @@
 from defs.arquivos import ler_postos, salvar_postos, gerar_id
 from defs.usuarios import atualizar_status_usuario, obter_posto_usuario, obter_status_usuario
-from defs.utils import ler_texto, ler_float, ler_inteiro
+from defs.utils import ler_float, ler_inteiro, limpar_tela
 
 
 def cadastrar_posto(email_dono):
     print("== Cadastro de novo posto ==")
-    nome = ler_texto("Nome do posto: ")
+    nome = input("Nome do posto: ").strip()
+    if not nome:
+        print("Nome do posto não pode ficar vazio.")
+        return
     lat = ler_float("Latitude do posto (-90 a 90): ", minimo=-90.0, maximo=90.0)
     lon = ler_float("Longitude do posto (-180 a 180): ", minimo=-180.0, maximo=180.0)
     status = "livre"
@@ -23,7 +26,10 @@ def listar_postos():
         print("Nenhum posto cadastrado ainda.")
         return
     for posto in postos:
-        dono = posto[5] if len(posto) > 5 and posto[5] else "N/A"
+        if len(posto) > 5 and posto[5]:
+            dono = posto[5]
+        else:
+            dono = "N/A"
         print(f"{posto[0]} - {posto[1]} | Lat: {posto[2]:.6f} | Lon: {posto[3]:.6f} | Status: {posto[4]} | Dono: {dono}")
 
 
@@ -52,7 +58,10 @@ def fazer_checkin_posto(usuario_email):
         return
     print("== Postos livres para check-in ==")
     for posto in postos_livres:
-        dono = posto[5] if len(posto) > 5 and posto[5] else "N/A"
+        if len(posto) > 5 and posto[5]:
+            dono = posto[5]
+        else:
+            dono = "N/A"
         print(f"{posto[0]} - {posto[1]} | Lat: {posto[2]:.6f} | Lon: {posto[3]:.6f} | Dono: {dono}")
     posto_id = ler_inteiro("Digite o ID do posto para fazer check-in: ", minimo=1)
     selecionado = _buscar_posto_por_id(postos_livres, posto_id)
@@ -90,7 +99,10 @@ def fazer_checkout_posto(usuario_email):
         atualizar_status_usuario(usuario_email, "out", "")
         return
     # mostra as informações do posto e realiza o check-out
-    dono = posto_completo[5] if len(posto_completo) > 5 and posto_completo[5] else "N/A"
+    if len(posto_completo) > 5 and posto_completo[5]:
+        dono = posto_completo[5]
+    else:
+        dono = "N/A"
     print(f"Realizando check-out no posto {posto_completo[0]} - {posto_completo[1]} | Lat: {posto_completo[2]:.6f} | Lon: {posto_completo[3]:.6f} | Dono: {dono}")
     posto_completo[4] = "livre"
     salvar_postos(todos_postos)
@@ -110,10 +122,13 @@ def modificar_posto(email_dono):
     if selecionado is None:
         print("ID de posto não encontrado entre seus postos.")
         return
-    novo_nome = ler_texto("Novo nome do posto: ")
+    novo_nome = input("Novo nome do posto: ").strip()
+    if not novo_nome:
+        print("Nome do posto não pode ficar vazio.")
+        return
     nova_lat = ler_float("Nova latitude do posto (-90 a 90): ", minimo=-90.0, maximo=90.0)
     nova_lon = ler_float("Nova longitude do posto (-180 a 180): ", minimo=-180.0, maximo=180.0)
-    novo_status = ler_texto("Novo status do posto (livre/ocupado): ").lower()
+    novo_status = input("Novo status do posto (livre/ocupado): ").strip().lower()
     if novo_status not in ["livre", "ocupado"]:
         print("Status inválido. Use 'livre' ou 'ocupado'.")
         return
@@ -144,6 +159,7 @@ def deletar_posto(email_dono):
 
 def menu_posto(email_dono):
     while True:
+        limpar_tela()
         print("\n===== Gerenciamento de postos =====")
         print("1 - Ver meus postos")
         print("2 - Cadastrar posto")
@@ -152,12 +168,16 @@ def menu_posto(email_dono):
         print("0 - Voltar")
         opcao = ler_inteiro("Escolha uma opção: ", minimo=0, maximo=4)
         if opcao == 1:
+            limpar_tela()
             listar_postos_do_dono(email_dono)
         elif opcao == 2:
+            limpar_tela()
             cadastrar_posto(email_dono)
         elif opcao == 3:
+            limpar_tela()
             modificar_posto(email_dono)
         elif opcao == 4:
+            limpar_tela()
             deletar_posto(email_dono)
         elif opcao == 0:
             break

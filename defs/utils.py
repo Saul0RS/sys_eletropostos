@@ -1,3 +1,5 @@
+import os
+
 VALID_DOMINIOS = [
     "gmail.com",
     "hotmail.com",
@@ -12,20 +14,8 @@ VALID_DOMINIOS = [
 ]
 
 
-def ler_texto(mensagem):
-    while True:
-        texto = input(mensagem).strip()
-        if texto:
-            return texto
-        print("Entrada inválida. Por favor, informe um texto não vazio.")
-
-
-def ler_senha(mensagem):
-    while True:
-        senha = input(mensagem).strip()
-        if senha:
-            return senha
-        print("Entrada inválida. Por favor, informe uma senha não vazia.")
+def limpar_tela():
+    os.system("cls")
 
 
 def validar_email(email):
