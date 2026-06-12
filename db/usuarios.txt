@@ -1,3 +1,8 @@
-srs6@cesar.school,saulinho,saulo123,dono_de_posto,out,
+srs6@cesar.school,saulinho,saulo123,dono_de_posto,in,14
 juninho@gmail.com,juninho,juninho123,cliente,out,
 beatriz@gmail.com,beatriz,beatriz123,cliente,out,
+apolo@outlook.com,apolo,apolo123,dono_de_posto,out,
+green@icloud.com,green,green123,dono_de_posto,out,
+cliente1@gmail.com,cliente1,cli123,cliente,out,
+cliente2@hotmail.com,cliente2,cli234,cliente,out,
+cliente3@uol.com,cliente3,cli345,cliente,out,

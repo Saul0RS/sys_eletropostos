@@ -2,7 +2,7 @@ from defs.usuarios import menu_autenticacao, menu_gerenciar_usuario, obter_statu
 from defs.postos import listar_postos, fazer_checkin_posto, fazer_checkout_posto, menu_posto
 from defs.calculos import rota_postos
 from defs.arquivos import ler_postos
-from defs.utils import ler_float, ler_inteiro, limpar_tela
+from defs.utils import ler_float, ler_inteiro, limpar_tela, pausar
 
 
 def menu_rotas():
@@ -26,6 +26,7 @@ def menu_rotas():
     print("\n== Postos no caminho ==")
     for posto in postos_no_caminho:
         print(f"{posto[0]} - {posto[1]} | Status: {posto[4]} | Distância até a rota: {posto[5]} m")
+    pausar()
 
 
 def menu_usuario_logado(usuario_email, nome_usuario, usuario_tipo):

@@ -58,3 +58,11 @@ def ler_float(mensagem, minimo=None, maximo=None):
             return flutuante
         except ValueError:
             print("Entrada inválida. Por favor, digite um número decimal válido.")
+
+
+def pausar():
+    try:
+        input("Digite ENTER para continuar...")
+    except Exception:
+        # em ambientes não interativos, ignore
+        return
