@@ -82,7 +82,7 @@ def fazer_checkin_posto(usuario_email):
     for posto in postos_livres:
         print(f"{posto[0]} - {posto[1]} | Lat: {posto[2]:.6f} | Lon: {posto[3]:.6f} | Dono: {posto[5]}")
 
-    posto_id = ler_inteiro("Digite o ID do posto para fazer check-in: ", minimo=1, maximo=len(todos_postos))
+    posto_id = ler_inteiro("Digite o ID do posto para fazer check-in: ")
     selecionado = _buscar_posto_por_id(postos_livres, posto_id)
     
     if selecionado is None:
@@ -150,7 +150,7 @@ def modificar_posto(email_dono):
         return
     
     listar_postos_do_dono(email_dono)
-    posto_id = ler_inteiro("Digite o ID do posto que deseja alterar: ", minimo=1, maximo=len(postos))
+    posto_id = ler_inteiro("Digite o ID do posto que deseja alterar: ")
     selecionado = _buscar_posto_por_id(meus_postos, posto_id)
 
     if selecionado is None:
@@ -158,20 +158,51 @@ def modificar_posto(email_dono):
         pausar()
         return
     
-    novo_nome = input(f"Novo nome do posto (ENTER para manter '{selecionado[1]}'): ").strip()
+    # Nome: manter se usuário pressionar ENTER
+    novo_nome = input(f"Novo nome do posto (ENTER para manter '{selecionado[1]}'): ")
+    if novo_nome is not None:
+        novo_nome = novo_nome.strip()
+    if novo_nome == "":
+        novo_nome = selecionado[1]
 
-    if not novo_nome:
-        print("Nome do posto não pode ficar vazio.")
-        return
-    
-    nova_lat = ler_float("Nova latitude do posto (-90 a 90): ", minimo=-90.0, maximo=90.0)
-    nova_lon = ler_float("Nova longitude do posto (-180 a 180): ", minimo=-180.0, maximo=180.0)
-    novo_status = input("Novo status do posto (livre/ocupado): ").strip().lower()
-    
+    # Latitude: permitir ENTER para manter, caso contrário validar
+    while True:
+        entrada_lat = input(f"Nova latitude do posto (-90 a 90) (ENTER para manter {selecionado[2]}): ").strip()
+        if entrada_lat == "":
+            nova_lat = selecionado[2]
+            break
+        try:
+            nova_lat = float(entrada_lat)
+            if nova_lat < -90.0 or nova_lat > 90.0:
+                print("Latitude fora do intervalo (-90 a 90).")
+                continue
+            break
+        except ValueError:
+            print("Entrada inválida. Digite uma latitude válida ou ENTER para manter.")
+
+    # Longitude: permitir ENTER para manter, caso contrário validar
+    while True:
+        entrada_lon = input(f"Nova longitude do posto (-180 a 180) (ENTER para manter {selecionado[3]}): ").strip()
+        if entrada_lon == "":
+            nova_lon = selecionado[3]
+            break
+        try:
+            nova_lon = float(entrada_lon)
+            if nova_lon < -180.0 or nova_lon > 180.0:
+                print("Longitude fora do intervalo (-180 a 180).")
+                continue
+            break
+        except ValueError:
+            print("Entrada inválida. Digite uma longitude válida ou ENTER para manter.")
+
+    # Status: manter se ENTER, caso contrário validar valor
+    novo_status = input(f"Novo status do posto (livre/ocupado) (ENTER para manter '{selecionado[4]}'): ").strip().lower()
+    if novo_status == "":
+        novo_status = selecionado[4]
     if novo_status not in ["livre", "ocupado"]:
         print("Status inválido. Use 'livre' ou 'ocupado'.")
         return
-    
+
     selecionado[1] = novo_nome
     selecionado[2] = nova_lat
     selecionado[3] = nova_lon
@@ -195,7 +226,7 @@ def deletar_posto(email_dono):
         return
     
     listar_postos_do_dono(email_dono)
-    posto_id = ler_inteiro("Digite o ID do posto que deseja deletar: ", minimo=1, maximo=len(postos))
+    posto_id = ler_inteiro("Digite o ID do posto que deseja deletar: ")
     selecionado = _buscar_posto_por_id(meus_postos, posto_id)
 
     if selecionado is None:

@@ -37,11 +37,19 @@ def ler_inteiro(mensagem, minimo=None, maximo=None):
         valor = input(mensagem).strip()
         try:
             vinteiro = int(valor)
-            if vinteiro >= minimo and vinteiro <= maximo:
-                return vinteiro
-            else:
-                print(f"Valor deve ser entre {minimo} e {maximo}.")
-                continue        
+            if minimo is not None and vinteiro < minimo:
+                if maximo is not None:
+                    print(f"Valor deve ser entre {minimo} e {maximo}.")
+                else:
+                    print(f"Valor deve ser maior ou igual a {minimo}.")
+                continue
+            if maximo is not None and vinteiro > maximo:
+                if minimo is not None:
+                    print(f"Valor deve ser entre {minimo} e {maximo}.")
+                else:
+                    print(f"Valor deve ser menor ou igual a {maximo}.")
+                continue
+            return vinteiro
         except ValueError:
             print("Entrada inválida. Por favor, digite um número inteiro.")
 
@@ -51,11 +59,19 @@ def ler_float(mensagem, minimo=None, maximo=None):
         valor = input(mensagem).strip()
         try:
             vfloat = float(valor)
-            if vfloat >= minimo and vfloat <= maximo:
-                return vfloat
-            else:
-                print(f"Valor deve ser entre {minimo} e {maximo}.")
+            if minimo is not None and vfloat < minimo:
+                if maximo is not None:
+                    print(f"Valor deve ser entre {minimo} e {maximo}.")
+                else:
+                    print(f"Valor deve ser maior ou igual a {minimo}.")
                 continue
+            if maximo is not None and vfloat > maximo:
+                if minimo is not None:
+                    print(f"Valor deve ser entre {minimo} e {maximo}.")
+                else:
+                    print(f"Valor deve ser menor ou igual a {maximo}.")
+                continue
+            return vfloat
 
         except ValueError:
             print("Entrada inválida. Por favor, digite um número decimal válido.")
@@ -77,7 +93,7 @@ def menu_rotas():
     lon_ori = ler_float("Longitude de origem (-180 a 180): ", minimo=-180.0, maximo=180.0)
     lat_des = ler_float("Latitude de destino (-90 a 90): ", minimo=-90.0, maximo=90.0)
     lon_des = ler_float("Longitude de destino (-180 a 180): ", minimo=-180.0, maximo=180.0)
-    raio = ler_float("Buffer em metros para buscar postos: ", minimo=0.0)
+    raio = ler_float("Buffer em metros para buscar postos: ", minimo=0.0, maximo=100000.0)
     postos = ler_postos()
     if not postos:
         print("Nenhum posto cadastrado. Cadastre postos antes de traçar a rota.")
@@ -177,9 +193,9 @@ def main():
     from defs.usuarios import menu_autenticacao
 
     while True:
-        usuario_email, nome_usuario, usuario_tipo, _ = menu_autenticacao()
-        if usuario_email is None:
+        usuario = menu_autenticacao()
+        if usuario is None:
             break
-        usuario_deletado = menu_usuario_logado(usuario_email, nome_usuario, usuario_tipo)
+        usuario_deletado = menu_usuario_logado(usuario["email"], usuario["nome"], usuario["tipo"])
         if usuario_deletado:
             continue

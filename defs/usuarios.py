@@ -17,28 +17,43 @@ def cadastrar_usuario():
         return
     
     usuarios = ler_list_user()
-    if any(usuario[0] == email for usuario in usuarios):
+    existe = False
+    for usuario in usuarios:
+        if usuario[0] == email:
+            existe = True
+            break
+
+    if existe:
         print("E-mail já cadastrado. Utilize outro e-mail.")
         pausar()
         return
+    
     senha = input("Senha: ")
+
     if not senha:
         print("Senha não pode ficar vazia.")
         pausar()
         return
+    
     senha_confirmacao = input("Confirme a senha: ")
+
     if senha != senha_confirmacao:
         print("As senhas não coincidem. Tente novamente.")
         pausar()
         return
+    
     print("Escolha o tipo de usuário:")
     print("1 - Cliente")
     print("2 - Dono de posto")
+
     opcao_tipo = ler_inteiro("Tipo de usuário: ", minimo=1, maximo=2)
+
     if opcao_tipo == 1:
         tipo = "cliente"
+
     else:
         tipo = "dono_de_posto"
+    
     usuarios.append([email, nome, senha, tipo, "out"])
     save_user(usuarios)
     print(f"Usuário cadastrado com e-mail {email} e nome {nome}.")
@@ -48,27 +63,41 @@ def cadastrar_usuario():
 def fazer_login():
     print("== Login ==")
     email = input("E-mail do usuário: ").strip().lower()
+
     if not validar_email(email):
         print("E-mail inválido. Utilize um domínio suportado e formato correto.")
         pausar()
-        return None, None, None, None
+        return None
+    
     senha = input("Senha: ")
+
     if not senha:
         print("Senha não pode ficar vazia.")
         pausar()
-        return None, None, None, None
+        return None
+    
     usuarios = ler_list_user()
+    
     for usuario in usuarios:
         if usuario[0] == email and usuario[2] == senha:
             print(f"Bem-vindo, {usuario[1]}!")
+
             if len(usuario) > 4:
                 status = usuario[4]
+
             else:
                 status = "out"
-            return usuario[0], usuario[1], usuario[3], status
+
+            return {
+                "email": usuario[0],
+                "nome": usuario[1],
+                "tipo": usuario[3],
+                "status": status
+            }
+        
     print("E-mail ou senha incorretos. Tente novamente.")
     pausar()
-    return None, None, None, None
+    return None
 
 
 def obter_status_usuario(email_usuario):
@@ -163,14 +192,26 @@ def alterar_senha(email_usuario):
 
 def deletar_usuario(email_usuario):
     usuarios = ler_list_user()
-    usuarios_ativos = [usuario for usuario in usuarios if usuario[0] != email_usuario]
+    #usuarios_ativos = [usuario for usuario in usuarios if usuario[0] != email_usuario]
+    usuarios_ativos = []
+
+    for usuario in usuarios:
+        if usuario[0] != email_usuario:
+            usuarios_ativos.append(usuario)
+    
     if len(usuarios_ativos) == len(usuarios):
         print("Usuário não encontrado.")
         pausar()
         return False
+    
     save_user(usuarios_ativos)
     postos = ler_postos()
-    postos_ativos = [posto for posto in postos if len(posto) <= 5 or posto[5].lower() != email_usuario.lower()]
+    #postos_ativos = [posto for posto in postos if posto[5] != email_usuario]
+    postos_ativos = []
+    for posto in postos:
+        if len(posto) <= 5 or posto[5].lower() != email_usuario.lower():
+            postos_ativos.append(posto)
+            
     salvar_postos(postos_ativos)
     print("Usuário deletado com sucesso. Seus postos também foram removidos.")
     pausar()
@@ -223,11 +264,11 @@ def menu_autenticacao():
         
         elif opcao == 2:
             limpar_tela()
-            usuario_email, nome_usuario, usuario_tipo, usuario_status = fazer_login()
+            usuario = fazer_login()
         
-            if usuario_email is not None:
-                return usuario_email, nome_usuario, usuario_tipo, usuario_status
+            if usuario is not None:
+                return usuario
         
         elif opcao == 0:
             print("Encerrando o sistema. Até mais!")
-            return None, None, None, None
+            return None
